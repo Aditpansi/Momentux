@@ -1,0 +1,98 @@
+import pygame
+import sys
+import subprocess
+
+# Initialize Pygame
+pygame.init()
+
+# Set screen dimensions
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Momentux System Animation")
+
+# Load the Momentux Systems logo image
+momentux_logo_image = pygame.image.load("/Users/aditpansi/Desktop/Testing/MomentX.png")  # Replace "MomentX.png" with the actual file name
+momentux_logo_rect = momentux_logo_image.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+
+# Define font
+font = pygame.font.SysFont(None, 32)
+
+# Define colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+
+# Define text input box
+input_box = pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 + 100, 200, 32)
+color_inactive = pygame.Color('white')
+color_active = pygame.Color('dodgerblue2')
+color = color_inactive
+active = False
+text = ''
+text_surface = font.render(text, True, color)
+
+# Define variables to store password
+stored_password = "Momentux@123"  # Set the default password
+entered_password = ''
+
+# Define error message
+error_message = ''
+
+# Main loop
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            # If the user clicks on the input box, activate it
+            if input_box.collidepoint(event.pos):
+                active = not active
+            else:
+                active = False
+            color = color_active if active else color_inactive
+        if event.type == pygame.KEYDOWN:
+            # If the input box is active and the user presses a key, add the key to the text
+            if active:
+                if event.key == pygame.K_RETURN:
+                    # If the user presses Enter, check if the entered password matches the stored password
+                    if text == stored_password:
+                        error_message = ''
+                        # Open the second program
+                        subprocess.run(["/usr/bin/python3", "/Users/aditpansi/Desktop/Testing/gui.py"])
+                        # Close the first program
+                        pygame.quit()
+                        sys.exit()
+                    else:
+                        error_message = 'Error: Incorrect password!'
+                    text = ''
+                elif event.key == pygame.K_BACKSPACE:
+                    # If the user presses Backspace, remove the last character from the text
+                    text = text[:-1]
+                else:
+                    # Otherwise, add the pressed key to the text
+                    text += event.unicode
+            # Render the text with asterisks for the current input
+            text_surface = font.render("*" * len(text), True, color)
+
+    # Clear screen
+    screen.fill(BLACK)
+
+    # Display the Momentux Systems logo
+    screen.blit(momentux_logo_image, momentux_logo_rect)
+
+    # Draw the input box
+    pygame.draw.rect(screen, color, input_box, 2)
+    screen.blit(text_surface, (input_box.x + 5, input_box.y + 5))
+
+    # Display error message
+    error_text_surface = font.render(error_message, True, RED)
+    error_text_rect = error_text_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 150))
+    screen.blit(error_text_surface, error_text_rect)
+
+    # Update display
+    pygame.display.flip()
+
+pygame.quit()
+sys.exit()
