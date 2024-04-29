@@ -1,2 +1,2 @@
-# Confidential
-Momentux Project UI
+
+Momentux Project GUI
